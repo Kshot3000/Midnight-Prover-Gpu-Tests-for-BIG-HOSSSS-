@@ -28,24 +28,30 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
 - [ ] Raw rows (tsv/json) into bench-results/, unedited.
 - BLOCKER NOTE: GPU is currently serving an LLM workload (llama-server) — measured runs deferred until the GPU is free. Check `nvidia-smi` first; never kill another process.
 
-## 5. Ampere-specific breakage / build on sm_86 — OPEN (current focus)
-- [ ] Build in WSL2 `octanode` (GPU passthrough confirmed; Linux path = what the PR's
-      build.rs targets). CUDA toolkit + rust 1.90.0 install running via `wsl-setup.sh`.
-- [ ] Stock build, no features — full test suite (known-good floor).
-- [ ] gpu feature WITHOUT cuda (stub declines everything) — tests pass, proofs byte-identical to stock.
-- [ ] gpu + cuda on the 3090 — the real build. Likely friction: sppark patches, sm_86 codegen,
-      CUDA version.
-- [x] Windows-native build path: REPRODUCED AS INFEASIBLE this cycle — `gpu/build.rs` is
-      Linux-shaped (ar/-rpath/stdc++/x86_64-linux), and Windows lacks MSVC/CUDA (UAC blocks
-      install). Documented in STATE.md; a portable build.rs is a separate candidate PR if the
-      3090 work surfaces Windows-specific breakage worth fixing upstream.
+## 5. Build verification on sm_86 (WSL2 `octanode`) — DOING (nearly done)
+- [x] WSL build tree at PR head `6bcc6a56`; CUDA 13.0 + Rust 1.90.0 (repo-pinned) verified.
+- [x] Stock build (no features): PASS 46 s.
+- [x] Stock full test suite: **green, exit 0** (126 binaries) after downloading the missing
+      Filecoin SRS asset (`zk_stdlib/examples/assets/bls_filecoin_2p19`, git-ignored; the first
+      pass's 24 failures were all this one environment gap — PR touches neither zk_stdlib nor zkvm).
+- [x] Stub build (gpu without cuda): tests pass — `midnight-gpu` default build = stub;
+      conformance test passes (42 filtered = device-only).
+- [x] gpu + cuda build on the 3090: **PASS in 1 m 59 s** (MIDNIGHT_GPU_REQUIRE_CUDA=1; no
+      friction at build time — sppark/sm_86 issues would surface at runtime).
+- [x] Windows-native build path: REPRODUCED AS INFEASIBLE — `gpu/build.rs` is Linux-shaped
+      (ar/-rpath/stdc++/x86_64-linux); documented in STATE.md. Portable build.rs = separate
+      candidate PR if 3090 work surfaces Windows breakage worth fixing upstream.
+- [ ] Device runtime (byte-identity, conformance, bench): WAITING on GPU (llama-server 22 GB).
 
 ## 6. Daemon endurance — OPEN
 - [ ] Leave midnight-gpu-prover running across cycles.
 - [ ] Log restart-cap behavior, lease behavior, any hang/leak over long uptimes.
 - Needs the CUDA build first.
 
-## 7. Spec conformance — OPEN
-- [ ] Quint-trace / Lean-oracle conformance replay (gpu-conformance).
+## 7. Spec conformance — DOING (toolchain)
+- [x] Formal toolchain install started (node 20 -> quint 0.32.0 pinned -> elan+lake ->
+      Lean v4.35.0 oracle `lake build`). Log: `~/bench/logs/formal-install.log`.
+- [ ] Quint-trace / Lean-oracle conformance replay (gpu-conformance) via `scripts/quint_check.sh`.
 - [ ] Pass/fail vs pinned trace count: 1,078 traces, 40,473 transitions.
 - [ ] Map any failure to its GPU-0xx requirement ID.
+- [ ] Frozen v2 vectors digest re-verified in WSL: `de054ca4...bffb` == hardcoded in gpu-gate.sh.
