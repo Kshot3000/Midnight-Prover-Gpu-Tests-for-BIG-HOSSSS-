@@ -1,5 +1,38 @@
 # LOG — heartbeat per cycle
 
+## 2026-11-21 11:45 CST — cycle 3
+- **Item:** toolchain verification + stock baseline + gate launch (task 5, task 1 prerequisite).
+- **Findings:**
+  - WSL setup finished: CUDA Toolkit **13.0** installed, nvcc 13.0 at `/usr/local/cuda/bin`, gcc 13.2,
+    Rust 1.90.0 (repo-pinned), native clone at PR head `6bcc6a56`.
+  - **Stock build: PASS in 46 s** (no features, `cargo build --workspace`).
+  - **Stock full test suite: exit 0.** One test failed mid-run on the first pass —
+    `external::keccak_sha3::check_vk_ethereum_sig` — then the suite reported exit 0; re-running with
+    `--no-fail-fast` and persistent logs to capture the exact summary (see below).
+  - **GPU state:** 22.3/24 GB in use, GPU util **87 %** (llama-server actively serving this agent's
+    own inference). ~2.0 GB free. Measured GPU runs deferred per contention rule.
+  - **Environment note:** WSL `octanode` idle-shuts between commands (VM restarts, drops `/tmp` +
+    mounts). A `setsid sleep 604800` keep-alive is running; all long jobs now launch via setsid with
+    logs to `~/bench/logs` (persistent ext4) and use absolute tool paths.
+  - Bench harness read: `rc1-bench prepare` (SRS + pk, CPU, cached in `RC1_CACHE/rc1-chain-v1-k21/`),
+    `rc1-bench run` with `RC1_K=21 RC1_WARM=1 RC1_REP=1`; CUDA build gets `rc1_device` cfg and emits
+    `kernel_ms` + `device_peak_bytes` + device-verifier lines; stock binary re-verifies the GPU proof
+    when `RC1_STOCK_BIN` is set. PR reference (5090-Laptop, k=21): CPU 17.917 s, GPU 4.374 s, 4.10×.
+  - Device test suite inventory: `gpu/tests/prover.rs` has `seeded_proofs_equal_cpu` (task 1,
+    byte-identity at k=11..15, 31-bit seeds + 64-bit seeds — 100 MB of GPU VRAM) and
+    `quotient_check_mode_fuzz` (task 3). Gate = frozen v2 oracle vectors + `gpu-gate.sh` (canon form
+    `2^47-2^11-2^9+2^7+1`).
+- **Done:**
+  - Wrote + tested `bench-run.sh` (check/prepare/cpu/gpu with GPU-busy gate; gpu branch preserves the
+    device binary separately from the stock verifier). `check` reports GPU_BUSY_DEFER (1998/2013 MB
+    free < 2560 needed).
+  - Wrote `gate-run.sh` (stage 1 stock tests → stage 2 stub tests → stage 3 gpu+cuda build → stage 4
+    gpu+cuda tests), launched via setsid, logging to `~/bench/logs/`.
+- **GPU check:** busy (22.3 GB, 87 % util). No measured GPU runs this cycle.
+- **Next:** read `~/bench/logs/stage.log` + `stock-summary.txt` when gate finishes; investigate the
+  `check_vk_ethereum_sig` failure (environment vs regression); then task 1 byte-identity on device
+  once VRAM frees; k=21 benchmarks when the 3090 is idle.
+
 ## 2026-11-21 11:10 CST — cycle 2
 - **Item:** build environment (task 5 prerequisites).
 - **Findings:**

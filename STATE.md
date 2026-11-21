@@ -7,12 +7,19 @@ Resume point. Last updated: 2026-11-21 10:35 CST (cycle 1).
   CharlesHoskinson/midnight-zk), merge-base `72a0512a`. Clone at
   `~/midnight-gpu-work/midnight-zk`, branch `pr667`.
 - **Project repo:** initialized; SETUP.md, TASKS.md, STATE.md, RESULTS.md, LOG.md pushed (first push 2026-11-21).
-- **Toolchains installed this cycle:**
-  - rustup (stable 1.100.0 default, nightly-2026-05-29 for rustfmt — repo pins
-    channel 1.90.0 in rust-toolchain.toml, so the pinned 1.90.0 must also be installed before
-    building; verify `rustup toolchain list` each session).
-  - **In progress (background 2026-11-21):** MSVC Build Tools 2022 (C++ workload, for nvcc host
-    compile and blst) and CUDA Toolkit 13.5 (winget `Nvidia.CUDA`, `/s /toolkit` only — no driver).
+- **Toolchains (verified 2026-11-21, cycle 3):**
+  - WSL `octanode`: CUDA Toolkit **13.0** (`/usr/local/cuda/bin/nvcc`, sm_86 in DEFAULT_ARCHS),
+    gcc/g++/ar 13.2, Rust 1.90.0 (repo-pinned; rustfmt+clippy), native clone `~/midnight-zk` at PR
+    head `6bcc6a56`, branch `pr667`. C: mounted at `/mnt/c`.
+  - Stock build PASS 46 s; stock `cargo test --workspace` exit 0 (first pass) — re-running with
+    `--no-fail-fast` to capture per-binary summaries; one test failed mid-run:
+    `external::keccak_sha3::check_vk_ethereum_sig` (zk_stdlib golden/VK test — PR #667 touches
+    neither zk_stdlib nor zkvm, so this is not a PR regression; investigating).
+  - WSL idle-shut behavior: VM restarts between short commands (drops /tmp, mounts). Keep-alive
+    `setsid sleep 604800` running; long jobs launched via setsid, logs in `~/bench/logs/` (ext4),
+    absolute tool paths in every script.
+  - Windows Rust (1.100.0 / 1.90.0 / nightly-2026-05-29, rsproxy.cn) remains parked for
+    read-only work.
 - **Fork:** Kshot3000/midnight-zk exists (created 2026-11-21). Fix branches will be
   `gpu-3090/<short-topic>` in the fork.
 - **Build location (decision 2026-11-21):** WSL2 distro `octanode` (Ubuntu 24.04, root,
