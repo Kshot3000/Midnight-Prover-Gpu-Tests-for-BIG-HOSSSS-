@@ -11,10 +11,17 @@ Recorded 2026-11-21 by the Hermes local agent on Kyle Cox's PC.
 - `nvidia-smi` observed at 2026-11-21 10:22 CST: 285 W / 350 W, temp 67 C, ~21.7 GB VRAM in use by other workloads (see GPU contention note).
 
 ## CUDA toolkit
-- **NOT installed** as of 2026-11-21. No `nvcc` on PATH, no toolkit under
-  `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\`. The CUDA UMD 13.3 above is
-  driver-only. A CUDA 12.x (hosting sm_86) or 13.x toolkit must be installed before
-  the `gpu + cuda` build can compile. Flagged for the build step.
+- **Windows:** NOT installed as of 2026-11-21. Only the NVIDIA driver (610.60 / UMD 13.3) is
+  present. winget installs failed on UAC (agent shell is non-elevated).
+- **WSL2 (octanode):** toolkit being installed 2026-11-21 via the official CUDA apt repo
+  (cuda-toolkit-13.0, fallback 12.8). GPU is passed through from the Windows driver;
+  `nvidia-smi` inside the distro reports driver 610.60 and the full 24 GB.
+
+## Rust toolchains
+- **Windows:** rustup 1.100.0 stable (default), 1.90.0 (repo pin), nightly-2026-05-29 (rustfmt
+  pin). Installed 2026-11-21 via the rsproxy.cn mirror (static.rust-lang.org resets HTTP/2
+  connections from Windows here).
+- **WSL (octanode):** rustup default 1.90.0 + nightly-2026-05-29 installed by `wsl-setup.sh`.
 
 ## CPU / RAM
 - **CPU:** 11th Gen Intel Core i9-11900KF @ 3.50 GHz (8 cores / 16 threads)
@@ -24,14 +31,10 @@ Recorded 2026-11-21 by the Hermes local agent on Kyle Cox's PC.
 - **OS:** Microsoft Windows 11 Home
 - **Version / Build:** 10.0.26200 (26200)
 - **BIOS (SMBIOS):** 1.1.24
+- **WSL2:** distro `octanode` (Ubuntu 24.04 LTS, runs as root) — the build environment.
+  16 vCPU, 120 GB RAM, 825 GB free, GPU passthrough, native ext4 build tree.
+  (Second distro `salarad-enterprise-linux` is registered but does not start — not used.)
 - **Hostname note:** machine is a desktop ("Alien" form factor), user `kyleb_ypppor6`.
-
-## Rust toolchains
-- Rust was **NOT installed** at start; installed during setup on 2026-11-21 via
-  `rustup-init.exe` (downloaded over HTTP/1.1; the default HTTP/2 path to
-  static.rust-lang.org reset connections).
-- Pinned nightly-2026-05-29 (repo's rustfmt pin): **status pending** — install
-  after stable lands.
 
 ## GitHub
 - `gh` authenticated as **Kshot3000** (keyring), scopes: gist, read:org, repo, workflow.

@@ -29,11 +29,16 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
 - BLOCKER NOTE: GPU is currently serving an LLM workload (llama-server) — measured runs deferred until the GPU is free. Check `nvidia-smi` first; never kill another process.
 
 ## 5. Ampere-specific breakage / build on sm_86 — OPEN (current focus)
-- [ ] Install CUDA toolkit (in progress via winget, 2026-11-21).
-- [ ] Install MSVC C++ toolchain (nvcc host compiler; in progress via winget).
+- [ ] Build in WSL2 `octanode` (GPU passthrough confirmed; Linux path = what the PR's
+      build.rs targets). CUDA toolkit + rust 1.90.0 install running via `wsl-setup.sh`.
 - [ ] Stock build, no features — full test suite (known-good floor).
 - [ ] gpu feature WITHOUT cuda (stub declines everything) — tests pass, proofs byte-identical to stock.
-- [ ] gpu + cuda on the 3090 — the real build. Likely friction: sppark patches, sm_86 codegen, CUDA version.
+- [ ] gpu + cuda on the 3090 — the real build. Likely friction: sppark patches, sm_86 codegen,
+      CUDA version.
+- [x] Windows-native build path: REPRODUCED AS INFEASIBLE this cycle — `gpu/build.rs` is
+      Linux-shaped (ar/-rpath/stdc++/x86_64-linux), and Windows lacks MSVC/CUDA (UAC blocks
+      install). Documented in STATE.md; a portable build.rs is a separate candidate PR if the
+      3090 work surfaces Windows-specific breakage worth fixing upstream.
 
 ## 6. Daemon endurance — OPEN
 - [ ] Leave midnight-gpu-prover running across cycles.
