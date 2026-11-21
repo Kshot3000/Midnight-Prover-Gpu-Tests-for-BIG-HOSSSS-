@@ -1,5 +1,33 @@
 # LOG — heartbeat per cycle
 
+## 2026-11-21 13:55 CST — cycle 3c/3d
+- **Item:** build verification closed out (task 5), bench params prepared, formal toolchain stood up (task 7).
+- **Findings:**
+  - **Stock full test suite: GREEN (exit 0, 126 binaries)** after the SRS fix. First pass's 24 failures
+    were all the single missing `bls_filecoin_2p19` asset — confirmed not a PR regression (572-file diff
+    touches neither zk_stdlib nor zkvm). SRS asset is git-ignored by `zk_stdlib/examples/assets/.gitignore`.
+  - **Stub build (gpu without cuda): tests pass** — midnight-gpu default build = stub mode;
+    conformance test passes (42 filtered = device-only).
+  - **gpu + cuda build on the 3090: PASS in 1 m 59 s** (MIDNIGHT_GPU_REQUIRE_CUDA=1). No build-time
+    friction — sppark/sm_86 issues would surface at runtime (deferred: VRAM busy).
+  - **Bench prepare (k=21, CPU): DONE** — RC1_CACHE has `params` (385 MB) + `pk` (193 MB) at
+    `/root/bench/rc1-cache/rc1-chain-v1-k21/` (the harness default; matches bench-run.sh).
+  - **Formal toolchain:** node v20.20.2 installed. Quint package discovery: `@informalsystems/quint`
+    (NOT @qntm/quint — 404; bare `quint` 1.2.0 on npm is an unrelated JS-helper package). Installed
+    `@informalsystems/quint@0.32.0` (matches the version the repo docs pin); `quint typecheck
+    quint/gpu_service.qnt` → exit 0.
+  - **Lean:** elan 4.4.0 (release tarball is the elan-init binary itself; `elan toolchain install`
+    with no args is a no-op in v4.4.0 — must pass the explicit toolchain name). Installed
+    `leanprover/lean4:v4.35.0` — exactly matches `formal/gpu-prover/lean/lean-toolchain`.
+    Oracle `lake build --wfail` running (log `~/bench/logs/oracle-build.log`).
+  - **Device-phase runner staged:** `device-phase.sh` (on ext4 `/root/bench/`) — gated on
+    `free_mb >= 2560`; runs D1 device tests → D2 canonical gpu-gate.sh (v2 vectors + ITF replay) →
+    D3 rc1 bench CPU+GPU k=21 (stock binary re-verifies device proofs) → D4 prover-par on/off.
+    Will fire automatically the moment VRAM frees.
+- **GPU check:** still busy (llama-server, ~22 GB). No measured GPU runs this cycle.
+- **Next:** oracle build finish → quint_check.sh trace generation → conformance replay (task 7);
+  then GPU-phase when VRAM frees (tasks 1/3/4).
+
 ## 2026-11-21 11:45 CST — cycle 3
 - **Item:** toolchain verification + stock baseline + gate launch (task 5, task 1 prerequisite).
 - **Findings:**

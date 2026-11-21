@@ -48,10 +48,17 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
 - [ ] Log restart-cap behavior, lease behavior, any hang/leak over long uptimes.
 - Needs the CUDA build first.
 
-## 7. Spec conformance — DOING (toolchain)
-- [x] Formal toolchain install started (node 20 -> quint 0.32.0 pinned -> elan+lake ->
-      Lean v4.35.0 oracle `lake build`). Log: `~/bench/logs/formal-install.log`.
+## 7. Spec conformance — DOING (toolchain 80% ready)
+- [x] node v20.20.2 (NodeSource) in WSL octanode.
+- [x] Quint: package is `@informalsystems/quint` (NOT @qntm/quint — 404; `quint` 1.2.0 on npm is
+      an unrelated JS-helper package). Installed @informalsystems/quint@0.32.0 (version matches the
+      pinned 0.32.0 in the repo's docs); `quint typecheck quint/gpu_service.qnt` → exit 0.
+- [x] Lean v4.35.0 installed via elan 4.4.0 (`elan toolchain install leanprover/lean4:v4.35.0`;
+      the repo's lean-toolchain pins exactly this). elan quirk: the release tarball is the
+      elan-init binary itself, and `elan toolchain install` (no args) does nothing in v4.4.0.
+- [ ] Lean oracle exe: `lake build --wfail` in formal/gpu-prover/lean running (log
+      `~/bench/logs/oracle-build.log`).
 - [ ] Quint-trace / Lean-oracle conformance replay (gpu-conformance) via `scripts/quint_check.sh`.
 - [ ] Pass/fail vs pinned trace count: 1,078 traces, 40,473 transitions.
 - [ ] Map any failure to its GPU-0xx requirement ID.
-- [ ] Frozen v2 vectors digest re-verified in WSL: `de054ca4...bffb` == hardcoded in gpu-gate.sh.
+- [x] Frozen v2 vectors digest re-verified in WSL: `de054ca4...bffb` == hardcoded in gpu-gate.sh.
