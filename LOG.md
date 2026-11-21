@@ -6,9 +6,12 @@
   - WSL setup finished: CUDA Toolkit **13.0** installed, nvcc 13.0 at `/usr/local/cuda/bin`, gcc 13.2,
     Rust 1.90.0 (repo-pinned), native clone at PR head `6bcc6a56`.
   - **Stock build: PASS in 46 s** (no features, `cargo build --workspace`).
-  - **Stock full test suite: exit 0.** One test failed mid-run on the first pass —
-    `external::keccak_sha3::check_vk_ethereum_sig` — then the suite reported exit 0; re-running with
-    `--no-fail-fast` and persistent logs to capture the exact summary (see below).
+  - **Stock full test suite, first pass: 24 FAILED — all one root cause.** Every failure is
+    `zk_stdlib` VK/cost tests + `tests/public_inputs.rs` + `tests/serialization.rs` + 2 doc tests,
+    all panicking in `filecoin_srs()`: the Filecoin SRS file `zk_stdlib/examples/assets/bls_filecoin_2p19`
+    was never downloaded on this fresh machine. **Not a PR regression** — `git diff 72a0512a..6bcc6a56`
+    touches neither `zk_stdlib/` nor `zkvm/` (572 files, all gpu/proofs/bench/formal). Downloaded the
+    97 MB SRS from Midnight's S3 (`SRS_DOWNLOAD_OK`) and re-running the full suite with `--no-fail-fast`.
   - **GPU state:** 22.3/24 GB in use, GPU util **87 %** (llama-server actively serving this agent's
     own inference). ~2.0 GB free. Measured GPU runs deferred per contention rule.
   - **Environment note:** WSL `octanode` idle-shuts between commands (VM restarts, drops `/tmp` +

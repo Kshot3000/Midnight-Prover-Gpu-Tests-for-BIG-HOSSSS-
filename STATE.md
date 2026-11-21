@@ -11,10 +11,10 @@ Resume point. Last updated: 2026-11-21 10:35 CST (cycle 1).
   - WSL `octanode`: CUDA Toolkit **13.0** (`/usr/local/cuda/bin/nvcc`, sm_86 in DEFAULT_ARCHS),
     gcc/g++/ar 13.2, Rust 1.90.0 (repo-pinned; rustfmt+clippy), native clone `~/midnight-zk` at PR
     head `6bcc6a56`, branch `pr667`. C: mounted at `/mnt/c`.
-  - Stock build PASS 46 s; stock `cargo test --workspace` exit 0 (first pass) — re-running with
-    `--no-fail-fast` to capture per-binary summaries; one test failed mid-run:
-    `external::keccak_sha3::check_vk_ethereum_sig` (zk_stdlib golden/VK test — PR #667 touches
-    neither zk_stdlib nor zkvm, so this is not a PR regression; investigating).
+  - Stock build PASS 46 s; stock `cargo test --workspace` first pass: 24 failures, all one root
+    cause — Filecoin SRS file `zk_stdlib/examples/assets/bls_filecoin_2p19` missing on this fresh
+    machine (downloaded from Midnight S3; PR #667 touches neither zk_stdlib nor zkvm, so not a
+    regression). Full re-run with `--no-fail-fast` in flight (gate-run.sh stage 1).
   - WSL idle-shut behavior: VM restarts between short commands (drops /tmp, mounts). Keep-alive
     `setsid sleep 604800` running; long jobs launched via setsid, logs in `~/bench/logs/` (ext4),
     absolute tool paths in every script.
