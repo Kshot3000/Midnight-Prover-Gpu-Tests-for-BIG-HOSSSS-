@@ -20,13 +20,19 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
 - [ ] Compare wave sizing vs the 5090-Laptop numbers from the PR.
 - [ ] Batch proofs byte-identical to solo proofs.
 
-## 4. Benchmarks (headline deliverable) — OPEN
-- [ ] rc1 bench harness, k = 21 path, cold + warm proofs, every proof checked by the stock CPU verifier.
-- [ ] GPU vs CPU on THIS machine (3090 + i9-11900KF).
+## 4. Benchmarks (headline deliverable) — DOING (CPU leg done; GPU leg deferred)
+- [x] rc1 bench harness, k = 21 path, cold + warm proofs, every proof checked by the stock CPU
+      verifier. **CPU MEASURED 2026-11-21:** 3 repeats × (1 cold + 5 warm) = 18 proofs, k=21,
+      8 prover threads. **CPU warm prove 26.27 s median** (21.22–27.22, stdev 1.91); cold 26.79 s
+      median; all 18 verified=true (verify ~1.8 ms). Raw: `raw/rc1-cpu-3090-2026-11-21.tsv`.
+- [ ] GPU vs CPU on THIS machine (3090 + i9-11900KF). **GPU leg DEFERRED — llama-server holds
+      ~21.7 GB VRAM; CPU leg needs no GPU so it ran anyway. device-phase.sh staged (gated
+      free_mb>=2560) fires D3 the moment VRAM frees.**
 - [ ] Place 3090 numbers next to the PR's 5090-Laptop numbers with the hardware difference stated.
-- [ ] Bench prover-par on/off.
-- [ ] Raw rows (tsv/json) into bench-results/, unedited.
-- BLOCKER NOTE: GPU is currently serving an LLM workload (llama-server) — measured runs deferred until the GPU is free. Check `nvidia-smi` first; never kill another process.
+- [ ] Bench prover-par on/off (D4; needs a second tree without the `prover-par` feature — ABAB).
+- [x] Raw rows (tsv/json) into bench-results/, unedited. (CPU rows archived; GPU rows to follow.)
+- BLOCKER NOTE: GPU is currently serving an LLM workload (llama-server) — measured GPU runs
+      deferred until the GPU is free. Check `nvidia-smi` first; never kill another process.
 
 ## 5. Build verification on sm_86 (WSL2 `octanode`) — DOING (nearly done)
 - [x] WSL build tree at PR head `6bcc6a56`; CUDA 13.0 + Rust 1.90.0 (repo-pinned) verified.
