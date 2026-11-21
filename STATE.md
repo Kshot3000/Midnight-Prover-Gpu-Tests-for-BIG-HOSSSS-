@@ -1,59 +1,50 @@
 # STATE — Midnight GPU Prover, RTX 3090
 
-Resume point. Last updated: 2026-11-21 10:35 CST (cycle 1).
+Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
 
 ## Current position
-- **midnight-zk head checked out:** `6bcc6a56` (PR #667, head branch `gpu-prover-draft` in
-  CharlesHoskinson/midnight-zk), merge-base `72a0512a`. Clone at
-  `~/midnight-gpu-work/midnight-zk`, branch `pr667`.
-- **Project repo:** initialized; SETUP.md, TASKS.md, STATE.md, RESULTS.md, LOG.md pushed (first push 2026-11-21).
-- **Toolchains (verified 2026-11-21, cycle 3):**
-  - WSL `octanode`: CUDA Toolkit **13.0** (`/usr/local/cuda/bin/nvcc`, sm_86 in DEFAULT_ARCHS),
-    gcc/g++/ar 13.2, Rust 1.90.0 (repo-pinned; rustfmt+clippy), native clone `~/midnight-zk` at PR
-    head `6bcc6a56`, branch `pr667`. C: mounted at `/mnt/c`.
-  - Stock build PASS 46 s; stock `cargo test --workspace` first pass: 24 failures, all one root
-    cause — Filecoin SRS file `zk_stdlib/examples/assets/bls_filecoin_2p19` missing on this fresh
-    machine (downloaded from Midnight S3; PR #667 touches neither zk_stdlib nor zkvm, so not a
-    regression). Full re-run with `--no-fail-fast` in flight (gate-run.sh stage 1).
-  - WSL idle-shut behavior: VM restarts between short commands (drops /tmp, mounts). Keep-alive
-    `setsid sleep 604800` running; long jobs launched via setsid, logs in `~/bench/logs/` (ext4),
-    absolute tool paths in every script.
-  - Windows Rust (1.100.0 / 1.90.0 / nightly-2026-05-29, rsproxy.cn) remains parked for
-    read-only work.
-- **Fork:** Kshot3000/midnight-zk exists (created 2026-11-21). Fix branches will be
-  `gpu-3090/<short-topic>` in the fork.
-- **Build location (decision 2026-11-21):** WSL2 distro `octanode` (Ubuntu 24.04, root,
-  16 cores, 120 GB RAM). Build tree: `~/midnight-zk` (native ext4, PR head 6bcc6a56).
-  Windows-side Rust (stable 1.100.0, 1.90.0, nightly-2026-05-29) remains usable for reading
-  and non-build work, but no Windows build is attempted — see blockers.
+- **Task 7 (formal toolchain + conformance): COMPLETE.** Full chain built and proven in WSL
+  `octanode`: node 20.20.2 → `@informalsystems/quint@0.32.0` → elan 4.4.0 → Lean 4.35.0 (matches
+  `lean-toolchain`) → oracle exe (119 MB, `.lake/build/bin/oracle`). `scripts/quint_check.sh`
+  conformance replay: **PASS, exact match to upstream** — 20/20 instances `quint check` ok
+  (10,000 samples each), 34 replay sections = **1,078 traces / 40,473 transitions / 0 disagree /
+  0 excused**, 3 refusals + 2 negative controls behave, initial states 1,078/0 differ.
+  Log: `raw/conformance-2026-11-21.log`.
+- **Task 5 (build verification): COMPLETE** (cycle 3c/3d). Stock build PASS 46 s; stock full
+  suite GREEN 126/126 after SRS fix; stub build + tests pass; `gpu + cuda` device build PASS
+  1 m 59 s; bench prepare (k=21) done (577 MB at `/root/bench/rc1-cache/rc1-chain-v1-k21/`).
+- **rc1 bench toolchain (cycle 3e): COMPLETE.** Canonical `build.sh` (repo root) → `rc1-cpu`
+  3.4 MB + `rc1-gpu` (sm_86) 5.8 MB at `/root/rc1-results/bin/`; `cargo fetch` done (offline
+  builds work). **CPU baseline (3 repeats, warm=5) RUNNING** — CPU leg does not use the GPU, so it
+  proceeds while llama-server holds VRAM (contention rule permits CPU work). Log
+  `~/bench/logs/rc1-cpu-phase.log`.
+- **midnight-zk head:** `6bcc6a56` (PR #667 head), merge-base `72a0512a`. Native clone
+  `~/midnight-zk`, branch `pr667`.
+- **Toolchains:** WSL `octanode` CUDA 13.0 (`/usr/local/cuda/bin/nvcc`, sm_86 in DEFAULT_ARCHS),
+  gcc 13.2, Rust 1.90.0 (repo-pinned). Windows Rust (1.100.0/1.90.0/nightly) parked for read-only.
+- **Fork:** Kshot3000/midnight-zk; fix branches `gpu-3090/<short-topic>`.
+- **Device phase staged:** `~/bench/device-phase.sh` (gated `free_mb >= 2560`): D1 device tests →
+  D2 canonical `gpu-gate.sh` → D3 rc1 bench GPU + stock re-verify → D4 prover-par on/off
+  (soft-gated; needs a second tree without the `prover-par` feature — ABAB staged next cycle).
+  Fires the moment VRAM frees.
 
 ## Known facts (observed, not assumed)
-- GPU: RTX 3090 24 GB, driver/KMD 610.60, CUDA UMD 13.3, WDDM. sm_86.
-- GPU was BUSY at cycle 1: llama-server (this agent's own LLM backend) holding ~21.7 GB.
-  Measured GPU runs deferred; CPU/build work proceeds.
-- CPU i9-11900KF 8C/16T, 128 GiB RAM, Windows 11 Home build 26200.
-- Network quirk: `static.rust-lang.org` resets connections on HTTP/2 (curl + rustup both fail);
-  rustup works with `RUSTUP_DIST_SERVER=https://rsproxy.cn RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup`,
-  and a plain curl download worked with `--http1.1`.
-- **Environment quirk (2026-11-21):** `/usr/bin/link` in git-bash is a PE32+ Windows exe (33 KB,
-  2026-03-23) that shadows MSVC's `link.exe` for rustc; the stock workspace build failed at link
-  with "link: extra operand ...rcgu.o". Must run cargo with MSVC's bin dir first on PATH (vcvars)
-  OR move/rename the stray /usr/bin/link.
-- **Privilege (2026-11-21):** the agent shell runs non-elevated (whoami kyleb_ypppor6, not admin).
-  winget 1602 (BuildTools) and 0x800704c7 "canceled by the user" (CUDA — the UAC prompt was
-  declined/missed) both need admin. Elevated retry of BuildTools launched 2026-11-21 ~10:47 CST
-  via Start-Process -Verb RunAs; if the UAC prompt was missed it will fail again. CUDA 13.5
-  toolkit install must be retried elevated too. **This is a Kyle-only-unblock if UAC keeps failing.**
-- **build.rs portability finding (2026-11-21, code read, not yet reproduced at build time):**
-  `gpu/build.rs` is Linux-shaped. It will not build the CUDA core on Windows/MSVC:
-  (1) line 138 calls Unix `ar crs` to make libmidnight_gpu_cuda.a — MSVC has no `ar` (lib.exe);
-  (2) line 154 emits `-Wl,-rpath,...` which link.exe rejects; (3) line 159 links `dylib=stdc++`
-  (no such import lib on MSVC); (4) `cuda_target_lib()` returns `x86_64-linux`, never
-  `x86_64-windows`. So `gpu + cuda` on Windows falls back to the declining stub even with nvcc
-  present, until build.rs is made portable. The PR's CI note ("workflows have not yet run on a
-  GitHub runner") plus the Linux-only device diagnostic paths suggest this was never built on
-  Windows. This is candidate task-5 material: reproduce at build time, then fix (branch
-  gpu-3090/windows-build) or document as an environment limit.
+- GPU: RTX 3090 24 GB, driver 610.60, CUDA UMD 13.3, WDDM, sm_86.
+- **PR reference (5090-Laptop, k=21, from repo RESULTS.md):** GPU warm **4.374 s** (615.2 MB
+  proof, 12,800 KB, 4.18 MB/s), CPU **17.917 s**, ratio **4.10×**; 32 KB input. Our CPU baseline
+  should land near ~17–18 s (16 cores, warm).
+- **Upstream conformance (formal/gpu-prover/RESULTS.md):** 1,078 traces / 40,473 transitions,
+  20 instances (10,000 samples), 14 directed tests, 0 violations, 0 excused — our local replay
+  matches it exactly.
+- WSL idle-shut: VM restarts between short commands. Keep-alive `setsid sleep 604800` running;
+  long jobs via setsid, logs in `~/bench/logs/` (ext4), absolute tool paths in every script.
+- Network quirk: `static.rust-lang.org` resets HTTP/2; use rsproxy.cn / `curl --http1.1`.
+- **build.rs on Windows:** Linux-shaped (`ar crs`, `-Wl,-rpath`, `dylib=stdc++`, `x86_64-linux`
+  only) → `gpu + cuda` falls back to the declining stub on Windows/MSVC. Reproduced infeasible
+  cycle 3; documented as environment limit (WSL2 is the path the PR was written for).
+- CPU: i9-11900KF 8C/16T, 128 GiB RAM, Windows 11 Home build 26200 (agent shell non-elevated).
+- Windows-side quirk: stray `/usr/bin/link` (PE32+ exe) shadowed MSVC `link.exe` for rustc; moved
+  aside to `~/midnight-gpu-work/stray-usr-bin-link.bak`. Windows build abandoned in favor of WSL2.
 
 ## Blockers (one line each)
 - ~~CUDA toolkit + MSVC install via winget (needs admin)~~ SUPERSEDED 2026-11-21: UAC prompts were

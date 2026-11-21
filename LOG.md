@@ -1,5 +1,29 @@
 # LOG — heartbeat per cycle
 
+## 2026-11-21 15:52 CST — cycle 3e
+- **Item:** conformance replay completed (task 7 closed); rc1 bench binaries pre-built; CPU baseline phase started.
+- **Findings:**
+  - **FORMAL CONFORMANCE: PASS — exact match to the upstream reference** (`formal/gpu-prover/RESULTS.md`):
+    - 20/20 service instances: `quint check` (10,000 fresh samples each) → `[ok] No violation found`, 0 excused.
+    - 34 replay sections (20 instances × 50 traces + 14 directed): **1,078 traces, 40,473 transitions,
+      0 disagreements, 0 excused** — identical to the pinned upstream counts.
+    - 3 refusal tests pass; 2 negative controls behave (perturbed traces DISAGREE, perturbed start state differs);
+      initial-state check: 1,078 traces, 0 differ.
+    - Full log archived: `raw/conformance-2026-11-21.log` (1,092 lines).
+  - **rc1 bench toolchain complete (CPU + GPU sm_86):** canonical `build.sh` from repo root;
+    `rc1-cpu` 3.4 MB + `rc1-gpu` 5.8 MB at `/root/rc1-results/bin/`; `cargo fetch` done so
+    `--offline` builds work; prepared 577 MB k=21 cache reused (RC1_CACHE override).
+  - **Key scheduling decision:** the rc1 bench **CPU leg does not use the GPU** — CPU work is allowed
+    under the contention rule, so the CPU baseline (3 repeats × warm=5, canonical protocol) is running
+    NOW while llama-server holds VRAM. GPU leg + device tests remain deferred.
+  - Script-hygiene fixes: `device-phase.sh` D2 pointed at the wrong gate path (fixed:
+    `gpu/scripts/gpu-gate.sh`); D4 soft-gated (prover-par on/off needs a second tree without the
+    feature — `rc1-bench-cuda` hard-couples it; two-tree ABAB to be staged next cycle);
+    `bench-run.sh` GPU build now pins `MIDNIGHT_GPU_ARCHS=86` (default fat list compiles 6 archs).
+- **GPU check:** still busy (llama-server). No measured GPU runs this cycle.
+- **Next:** collect CPU baseline numbers (log `~/bench/logs/rc1-cpu-phase.log`); then the moment
+  VRAM frees: device-phase.sh (D1 device tests → D2 canonical gate → D3 GPU bench + stock re-verify).
+
 ## 2026-11-21 13:55 CST — cycle 3c/3d
 - **Item:** build verification closed out (task 5), bench params prepared, formal toolchain stood up (task 7).
 - **Findings:**

@@ -56,9 +56,19 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
 - [x] Lean v4.35.0 installed via elan 4.4.0 (`elan toolchain install leanprover/lean4:v4.35.0`;
       the repo's lean-toolchain pins exactly this). elan quirk: the release tarball is the
       elan-init binary itself, and `elan toolchain install` (no args) does nothing in v4.4.0.
-- [ ] Lean oracle exe: `lake build --wfail` in formal/gpu-prover/lean running (log
-      `~/bench/logs/oracle-build.log`).
-- [ ] Quint-trace / Lean-oracle conformance replay (gpu-conformance) via `scripts/quint_check.sh`.
-- [ ] Pass/fail vs pinned trace count: 1,078 traces, 40,473 transitions.
+- [x] Lean oracle exe: `lake build --wfail` → **Build completed successfully (34 jobs)**, exit 0;
+      `.lake/build/bin/oracle` 119 MB. (First attempt was a broken heredoc that emptied `$LOG`;
+      re-ran cleanly. Log `~/bench/logs/oracle-build.log`.)
+- [x] Quint-trace / Lean-oracle conformance replay: `scripts/quint_check.sh` → **PASS, exact
+      match to upstream reference** (`formal/gpu-prover/RESULTS.md`). 20/20 instances
+      `quint check` `[ok] No violation found` (10,000 fresh samples each); 34 replay sections =
+      20×10,000-sample instances + 14 directed; **1,078 traces replayed, 40,473 transitions
+      agreed, 0 excused, 0 violations**; 3 refusal tests + 2 negative controls
+      (perturbed traces DISAGREE, perturbed start state differs — both expected);
+      **initial states: 1,078 traces checked, 0 differ**. Full log:
+      `project-repo/raw/conformance-2026-11-21.log` (1,092 lines).
+- [x] Pass/fail vs pinned trace count: 1,078 traces, 40,473 transitions — **EXACT MATCH**.
+- [x] Toolchain proven end-to-end: node 20.20.2 → Quint 0.32.0 → elan 4.4.0 → Lean 4.35.0 →
+      oracle exe → conformance replay. **Task 7 complete.**
 - [ ] Map any failure to its GPU-0xx requirement ID.
 - [x] Frozen v2 vectors digest re-verified in WSL: `de054ca4...bffb` == hardcoded in gpu-gate.sh.
