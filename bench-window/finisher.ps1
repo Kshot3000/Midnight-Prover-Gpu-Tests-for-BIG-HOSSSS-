@@ -21,7 +21,10 @@ function wfree() { (nvidia-smi --query-gpu=memory.free --format=csv,noheader,nou
 $recFile = Join-Path $dir 'server-record.json'
 if (-not (Test-Path $recFile)) { wlog 'ABORTED-no-record'; exit 1 }
 $rec = Get-Content $recFile -Raw | ConvertFrom-Json
-$rec.RouterKey = (Get-RouterKey)
+# NOTE: the key is NEVER attached to $rec — in Windows PowerShell 5.1,
+# dot-assigning a new property onto a ConvertFrom-Json PSCustomObject fails
+# (silently, under $ErrorActionPreference='Continue'), which shipped an empty
+# bearer token and a 401 abort on 2026-11-22. Call Get-RouterKey() at each use.
 wlog ('finisher start (ps pid=' + $PID + '; recorded worker pid=' + $rec.WorkerPid + ' port=' + $rec.WorkerPort + ' router=' + $rec.RouterPid + ' model=' + $rec.ModelId + ')')
 
 if (-not (Test-Path (Join-Path $dir 'ARMED'))) { wlog 'ABORTED-no-ARMED'; exit 1 }
@@ -40,7 +43,7 @@ if ($others) {
 }
 # router sanity: the model must be loaded per the router API
 try {
-  $hm = @{ Authorization = ('Bearer ' + $rec.RouterKey) }
+  $hm = @{ Authorization = ('Bearer ' + (Get-RouterKey)) }
   $m = ((Invoke-RestMethod -Uri $rec.ModelsUrl -Headers $hm -TimeoutSec 30).data) | Where-Object { $_.id -eq $rec.ModelId }
   wlog ('router says model status=' + $m.status.value)
   if ($m.status.value -ne 'loaded' -and $m.status.value -ne 'ready') { wlog 'ABORTED-wrong-process: model not loaded per router API'; exit 1 }
@@ -59,7 +62,7 @@ wlog ('holder verified: worker pid=' + $rec.WorkerPid + ' (parent router ' + $re
 $idle = $false
 for ($i = 0; $i -lt 30; $i++) {
   try {
-    $h3 = @{ Authorization = ('Bearer ' + $rec.RouterKey) }
+    $h3 = @{ Authorization = ('Bearer ' + (Get-RouterKey)) }
     $slots = Invoke-RestMethod -Uri ($rec.RouterBase + '/slots?model=' + [uri]::EscapeDataString($rec.ModelId)) -Headers $h3 -TimeoutSec 15
     if (-not ($slots | Where-Object { $_.is_processing })) {
       $idle = $true
@@ -79,7 +82,7 @@ if (-not $idle) {
 
 # --- 3) stop the server: router's native /models/unload (its designed path) ---
 try {
-  $h2 = @{ Authorization = ('Bearer ' + $rec.RouterKey) }
+  $h2 = @{ Authorization = ('Bearer ' + (Get-RouterKey)) }
   $r = Invoke-RestMethod -Method Post -Uri $rec.UnloadUrl -Headers $h2 -ContentType 'application/json' `
       -Body ('{"model":"' + $rec.ModelId + '"}') -TimeoutSec 180
   wlog ('unload API returned: ' + (($r | ConvertTo-Json -Compress -Depth 3)))

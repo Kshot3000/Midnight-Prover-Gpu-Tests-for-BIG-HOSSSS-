@@ -63,7 +63,10 @@ Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
   (`MidnightBenchWindowDeadman`, 15-min cadence), D2 verdict grep fixed to the gate's real
   verdict lines. Athena Dev Cycle: no such Windows scheduled task exists (verified 187 tasks;
   all Hermes cron stores empty, Athena executions.db 0 rows) — nothing to pause; recorded as
-  `AthenaTask: null`. Dry window armed next.
+  `AthenaTask: null`. Dry window attempt 1 (2026-11-22 03:03) failed on a 401 at the
+  finisher's first router check: PS 5.1 dot-assign of a new property onto a ConvertFrom-Json
+  object fails silently → empty bearer token. Fixed: key read inline at every use site +
+  authenticated pre-flight before ARMED in arm-dry.ps1. Attempt 2 armed.
 
 ## Bench window (GPU leg machinery)
 - Signal folder `C:\bench-window\` (WSL `/mnt/c/bench-window/`): ARMED / SERVER-DOWN / DONE /

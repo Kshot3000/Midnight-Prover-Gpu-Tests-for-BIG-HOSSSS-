@@ -27,6 +27,20 @@ if ($others) { wlog 'ARM-ABORT: extra llama-server present'; Write-Output 'ARM-A
 $free = [int](nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits)
 if ($free -lt 1500) { wlog ('ARM-ABORT: only ' + $free + ' MB free (unexpected holder)'); Write-Output 'ARM-ABORT: VRAM dirty'; exit 1 }
 
+# pre-flight: the router API must answer with the live key BEFORE ARMED is
+# written. Dry-window attempt 1 (2026-11-22) failed on a 401 after the agent
+# had stepped off — fail while the agent is still in the turn instead.
+. "$dir\restart-core.ps1"
+try {
+  $h0 = @{ Authorization = ('Bearer ' + (Get-RouterKey)) }
+  $null = Invoke-RestMethod -Uri $rec.ModelsUrl -Headers $h0 -TimeoutSec 30
+  wlog 'router pre-flight OK: /models answered with the live key'
+} catch {
+  wlog ('ARM-ABORT: router pre-flight failed: ' + $_.Exception.Message)
+  Write-Output 'ARM-ABORT: router API pre-flight failed — do not step off'
+  exit 1
+}
+
 wlog ('ARM dry window armed; worker pid=' + $rec.WorkerPid + ' port=' + $rec.WorkerPort + ' router=' + $rec.RouterPid + ' model=' + $rec.ModelId + ' free_mb=' + $free)
 ((Get-Date).ToString('yyyy-MM-ddTHH:mm:ssK') + ' ARM dry window; worker pid=' + $rec.WorkerPid + ' port=' + $rec.WorkerPort + ' router=' + $rec.RouterPid) |
   Out-File (Join-Path $dir 'ARMED') -Encoding utf8

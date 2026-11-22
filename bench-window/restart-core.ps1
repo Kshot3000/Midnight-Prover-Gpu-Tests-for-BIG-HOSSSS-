@@ -18,7 +18,7 @@ function Invoke-RouterTouch {
     # Same readiness proof the Hermes supervisor uses (supervisor.py touch_generate).
     $body = '{"model":"' + $rec.ModelId + '","messages":[{"role":"user","content":"Reply with exactly one word: the capital of France."}],"max_tokens":512,"temperature":0}'
     try {
-        $resp = Invoke-RestMethod -Method Post -Uri $rec.ChatUrl -Headers @{ Authorization = ('Bearer ' + $rec.RouterKey) } `
+        $resp = Invoke-RestMethod -Method Post -Uri $rec.ChatUrl -Headers @{ Authorization = ('Bearer ' + (Get-RouterKey)) } `
             -ContentType 'application/json' -Body $body -TimeoutSec 300
         $msg = $resp.choices[0].message
         $blob = (([string]$msg.content) + ' ' + ([string]$msg.reasoning_content)).ToLower()
@@ -32,7 +32,7 @@ function Invoke-RouterTouch {
 function Restore-RecordedServer {
     param($rec)
     # 1) reload the model through the router (synchronous; a 27B load is slow)
-    $h = @{ Authorization = ('Bearer ' + $rec.RouterKey) }
+    $h = @{ Authorization = ('Bearer ' + (Get-RouterKey)) }
     $status = 'unknown'
     try {
         $models = (Invoke-RestMethod -Uri $rec.ModelsUrl -Headers $h -TimeoutSec 30).data

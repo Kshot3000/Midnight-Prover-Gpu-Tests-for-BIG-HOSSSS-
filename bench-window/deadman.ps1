@@ -24,7 +24,8 @@ if (-not $need) { exit 0 }
 
 . "$dir\restart-core.ps1"
 $rec = Get-Content (Join-Path $dir 'server-record.json') -Raw | ConvertFrom-Json
-$rec.RouterKey = (Get-RouterKey)
+# the key is read at each use site (Get-RouterKey); never attached to $rec
+# (PS 5.1 dot-assign on a ConvertFrom-Json object fails silently — 2026-11-22).
 if (-not (Get-Process -Id $rec.RouterPid -ErrorAction SilentlyContinue)) {
   wlog 'DEADMAN-ROUTER-DEAD: router pid missing; the Hermes app supervises the router - not spawning anything'
   exit 0

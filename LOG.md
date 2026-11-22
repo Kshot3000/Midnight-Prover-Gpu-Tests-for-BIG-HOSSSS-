@@ -1,5 +1,27 @@
 # LOG — heartbeat per cycle
 
+## 2026-11-22 03:50 CST — cycle 5 (total orders received; dry window attempt 1 → fix → re-arm)
+- **Total orders received 2026-11-22; Phase 0 complete; proceeding to dry window.** (v3
+  "TOTAL ORDERS TO FINISH THE WORK", rewritten 2026-11-22 by Muse at Kyle's request;
+  supersedes v2. Extracted to prompt3-extracted.txt; working from it alone.)
+- **Dry window attempt 1 FAILED at the finisher's first router check (03:03:17):**
+  `FIN ABORTED-wrong-process: router /models unreachable: (401) Unauthorized`. The safety
+  design worked as intended — the finisher aborted before touching anything (worker still
+  holds VRAM, model still loaded; verified on wake).
+- **Root cause (reproduced in-turn):** in Windows PowerShell 5.1, dot-assigning a NEW
+  property onto a `ConvertFrom-Json` PSCustomObject fails ("The property 'RouterKey' cannot
+  be found on this object"); non-terminating under `$ErrorActionPreference='Continue'`, so
+  the finisher continued with an EMPTY bearer token → 401. The key store is fine (curl with
+  the file's key: 200; direct `Get-RouterKey`: 32-char key, /models answers).
+- **Fix:** the key is never attached to `$rec` anymore — every use site calls
+  `Get-RouterKey()` inline (restart-core.ps1 ×2, finisher.ps1 ×3, deadman.ps1 ×1). And
+  `arm-dry.ps1` now runs a pre-flight — it must get an authenticated /models answer BEFORE
+  writing ARMED, so this failure class dies in-turn, not after the agent stepped off. All
+  seven scripts parse-check clean; no key in any repo file (grepped).
+- **RESULTS.md** already carries the measured CPU baseline (26.27 s warm median, 18/18
+  verified, cycle 3e) — v3 step 1's housekeeping requirement is satisfied by cfb44d4.
+- **Next:** dry window attempt 2 (identity re-recorded fresh at arming).
+
 ## 2026-11-22 02:30 CST — cycle 4 (bench window, Phase 0)
 - **Item:** read the v2 standing-orders rewrite ("complete standing orders (rewritten
   2026-11-21)"); built and verified the bench-window machinery (Phase 0, steps 1–3).
