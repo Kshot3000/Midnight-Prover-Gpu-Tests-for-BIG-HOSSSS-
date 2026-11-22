@@ -1,0 +1,196 @@
+== build
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.10.1
+   Compiling midnight-gpu v0.1.0 (/root/midnight-zk/gpu)
+   Compiling getrandom v0.4.3
+   Compiling rustix v1.1.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.1
+   Compiling fastrand v2.5.0
+   Compiling wait-timeout v0.2.1
+   Compiling cpufeatures v0.3.0
+   Compiling quick-error v1.2.3
+   Compiling bit-vec v0.10.1
+   Compiling fnv v1.0.7
+   Compiling unarray v0.1.4
+   Compiling core_detect v1.0.0
+   Compiling regex-syntax v0.8.11
+   Compiling tokio v1.54.1
+   Compiling midnight-gpu-conformance v0.1.0 (/root/midnight-zk/gpu-conformance)
+   Compiling rand_core v0.6.4
+   Compiling chacha20 v0.10.2
+   Compiling bit-set v0.11.1
+   Compiling rand_xorshift v0.5.0
+   Compiling rand v0.8.7
+   Compiling rand_xorshift v0.3.0
+   Compiling ff v0.13.1
+   Compiling crypto-bigint v0.5.5
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.10.3
+   Compiling group v0.13.0
+   Compiling curve25519-dalek v4.1.3
+   Compiling pairing v0.23.0
+   Compiling elliptic-curve v0.13.8
+   Compiling tempfile v3.27.0
+   Compiling primeorder v0.13.6
+   Compiling k256 v0.13.4
+   Compiling rusty-fork v0.3.1
+   Compiling p256 v0.13.2
+   Compiling proptest v1.12.0
+   Compiling midnight-curves v0.4.0-rc.1 (/root/midnight-zk/curves)
+   Compiling midnight-proofs v0.9.0-rc.1 (/root/midnight-zk/proofs)
+    Finished `release` profile [optimized] target(s) in 2m 45s
+    Finished `release` profile [optimized] target(s) in 1.04s
+== service vectors v2 and Quint ITF through the daemon adapter
+daemon ITF: 1078 files, 40473 transitions, 0 mismatching steps, 0 differing field observations
+29 service traces, 29 clean, 261 transitions, 0 mismatching transitions, 14 operation codes, live oracle: false
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 123.84s
+== fault_switch-b7642ce36e2cb0c2
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== midnight_gpu_conformance-d9a8b587a9cb114e
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== detect-9532b7d217701ed6
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+== wipe_env-b35d79b3f8d5fd3a
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+== stage_counters_concurrent-7dae9fb297e4628c
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+== admission-2903ef9e52abe25c
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+== bucket_residue-d7555693df34a5d3
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+== erase_fault-441383403f308148
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+== actor_protocol-91cdb5f97af3e166
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== actor_probe-f9723140739e2646
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+== actor_itf-05b61bc8a75ddfbd
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+== sanitizer_teardown-a6c1218787df336f
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+== staged_drain-41880fba0f9dcaf3
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+== teardown_context-c34ea1dabb5b2a20
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+== check_fault-c70ec6185d3776d6
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+== drain_pending-2a5934cb7e2eb63f
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+== pending_zeroed_unfreed-65553a03975de880
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+== teardown_waiter-a9f074457b4a3d21
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.77s
+== device-40f1564c60bd6c72
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.99s
+== quarantine-cf2a2a5de1ef5016
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+== teardown_lost-8588ef8b7f1df496
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+== msm_worker_exception-f993511e99abcbb5
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.05s
+== pending_erasure-2ab38d41e2dbc808
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+== first_use-68285d19d152db2f
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+== memory_limit-c0386fc87fde5dc0
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+== pending_presync-88ff384b36ced4b2
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+== prover-2a9d2eefb53e4ccd
+test quotient_fuzz_10000 ... node coverage over 10000 systems: add=282717 sub=22628 mul=75186 square=21048 double=20722 negate=17200 mul_add=100378 fixed=41352 advice=57674 instance=19154 rotated=62016
+test quotient_fuzz_covers_every_node ... node coverage over 16 systems: add=490 sub=35 mul=157 square=30 double=36 negate=26 mul_add=175 fixed=64 advice=105 instance=31 rotated=114
+test quotient_fuzz_small ... node coverage over 12 systems: add=357 sub=41 mul=90 square=34 double=29 negate=24 mul_add=131 fixed=57 advice=77 instance=28 rotated=85
+node coverage over 2 systems: add=50 sub=7 mul=5 square=3 double=2 negate=6 mul_add=20 fixed=11 advice=7 instance=3 rotated=11
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2835.43s
+== abi_layout-ce8bd0fa81de7496
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== error_drain-7c030c666f2a590e
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.45s
+== dtoh_private_no_fault-cbdf40777f93d266
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== unconfirmed_drain-c6d1f45a03c761aa
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+== teardown_ntt-656706dbd463431e
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+== msm_exception-b7a2b3288da6e555
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+== drain_teardown-f5b84a197ded0fbc
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+== readback-c5a7b6395bd9050e
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+== teardown_holders-3d06e82a37c65692
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+== actor_device_stress-a2ab91cc5820b7b7
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+== batch_admission-b45f2bbe3ef12675
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+== actor_stress-8c9d77a4ce4ddbb1
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.16s
+== actor_chan-306f842b1313f86a
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+== differential-29dd9d661a5f2d8a
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+== oracle arithmetic v2 (including gate and threshold)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.80s
+== midnight_gpu-58dfec89a26a403a
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.17s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.25s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.11s
+thread 'batch::tests::cleanup_payload_chain_is_dropped' panicked at gpu/src/batch.rs:1124:39:
+thread 'batch::tests::cleanup_payload_chain_is_dropped' panicked at gpu/src/batch.rs:1121:17:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.13s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.11s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.16s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.12s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.12s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.11s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.03s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.12s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.14s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.11s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.15s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.03s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.11s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.16s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.10s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.08s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+thread 'midnight-gpu-device' panicked at gpu/src/ffi.rs:793:17:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.17s
+thread '<unnamed>' panicked at gpu/src/ffi.rs:813:23:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+thread 'midnight-gpu-device' panicked at gpu/src/msm.rs:371:9:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.21s
+thread 'msm::tests::one_shot_guard_frees_during_unwind' panicked at gpu/src/msm.rs:581:13:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.21s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+thread 'midnight-gpu-device' panicked at gpu/src/quotient.rs:644:46:
+thread 'midnight-gpu-device' panicked at gpu/src/quotient.rs:659:46:
+thread 'midnight-gpu-device' panicked at gpu/src/quotient.rs:656:21:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.05s
+thread 'quotient::displaced_key_copies_count_once_on_session_unwind' panicked at gpu/src/quotient.rs:1105:13:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.15s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 0.00s
+test result: ok. 70 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.58s
+== sanitizer-098d2b47cdc464cf
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+== batch-a7ffb6892c2a96b6
+thread 'cpu_batch_matches_alone_and_isolates_panics' panicked at gpu/tests/batch.rs:212:17:
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.21s
+== kernel harness
+wrote target/gpu-gate/kernels.tsv
+MSM skew ratios (case time / uniform time, fastest of 7; limit 1.5):
+  uniform: max 1.000 at 2^14
+  repeated: max 1.040 at 2^16
+  zero90: max 1.025 at 2^15
+  small16: max 1.149 at 2^16
+GPU gate: passed (logs and kernels.tsv in target/gpu-gate)

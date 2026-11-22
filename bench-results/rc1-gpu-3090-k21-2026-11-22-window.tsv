@@ -1,0 +1,3 @@
+mode	rep	k	threads	start_load1	proof	state	prove_s	verify_s	verified	msm_calls	ntt_calls	quotient_calls	device_errors	fallbacks	declines	hook_declines	h2d_copies	h2d_bytes	d2h_copies	d2h_bytes	msm_d2h_copies	msm_d2h_bytes	stage	peak_device_bytes	gpu_model	device_total_bytes
+gpu	1	21	16	1.29	0	cold	5.352337854	0.003355023	true	11	7	1	0	0	[]	[]	47	4429185960	8	603979712	152	158994432	[1,67108864,27,2281701312,0,1,1,0]	1975223304	NVIDIA GeForce RTX 3090	25769279488
+gpu	1	21	16	1.29	1	warm	4.370434749	0.001767579	true	11	7	1	0	0	[]	[]	45	4294968264	8	603979712	136	142258176	[1,67108864,27,2281701312,0,1,1,0]	1975223304	NVIDIA GeForce RTX 3090	25769279488

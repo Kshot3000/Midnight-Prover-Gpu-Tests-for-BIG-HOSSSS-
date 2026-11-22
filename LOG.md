@@ -221,3 +221,27 @@
 - Docs: STATE.md / TASKS.md updated (dry window complete; real window armed next).
 - Next: arm the REAL window (D1 device tests → D2 byte-identity gate → D3 rc1 k=21 GPU
   bench → D4 prover-par soft).
+## Cycle 7 — 2026-11-22 09:45–10:30 CST — REAL WINDOW COMPLETE, RESULTS SUBMITTED
+- REAL bench window (armed 08:40, closed 09:45:47 — 65 min, clean close DONE → RESTORED →
+  WINDOW CLOSED; post-restore worker 13828 verified against the record):
+  - D1 device tests: pass (exit 0).
+  - D2 byte-identity gate: **`GPU gate: passed`** on the real 3090. Frozen v2 service
+    vectors + full Quint ITF through the daemon adapter: 1,078 files, 40,473 transitions,
+    0 mismatching steps, 0 differing field observations (matches upstream conformance
+    totals). 78 gate tests ok (device, batch isolation, sanitizer, kernel skew ≤ 1.5:
+    uniform max 1.000, repeated max 1.040). The `panicked at ...` lines in the log are the
+    expected output of the panic-isolation tests, each followed by `test result: ok`.
+    Evidence: `raw/win-d2-3090-2026-11-22.log` (unedited).
+  - D3 k=21 on the empty card (23,478 MB free), 16 threads: GPU warm **4.370 s** / cold
+    5.352 s; CPU warm **16.383 s** / cold 16.161 s → **3.75× warm / 3.02× cold**; peak
+    device 1,975.2 MB; all verified=true, 0 device errors, 0 fallbacks. Raw rows:
+    `bench-results/rc1-{gpu,cpu}-3090-k21-2026-11-22-window.tsv` (unedited).
+  - D4 (prover-par on/off A/B): SKIPPED — soft stage, off-arm prover-par binary not
+    staged; logged by the runner.
+- Notable: 3090 GPU warm 4.370 s is within 0.1% of the PR's 5090-Laptop 4.374 s, with a
+  byte-identical device peak (1,975.2 MB).
+- RESULTS.md rewritten: "Summary for Charles (reply-ready)" at the top, window numbers
+  beside the CPU baseline, byte-identity verdict with evidence, PR reference kept,
+  cross-machine observations added. STATE.md: no open unescalated blockers. TASKS.md:
+  benchmark items closed.
+- All six v3 Definition-of-Done items met. Work submitted; Kyle's Muse agent posts/shares.

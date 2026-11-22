@@ -25,18 +25,16 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
       verifier. **CPU MEASURED 2026-11-21:** 3 repeats × (1 cold + 5 warm) = 18 proofs, k=21,
       8 prover threads. **CPU warm prove 26.27 s median** (21.22–27.22, stdev 1.91); cold 26.79 s
       median; all 18 verified=true (verify ~1.8 ms). Raw: `raw/rc1-cpu-3090-2026-11-21.tsv`.
-- [ ] GPU vs CPU on THIS machine (3090 + i9-11900KF). **GPU leg → bench window (v3 total
-      orders).** Phase 0 complete 2026-11-22: three actors built + parse-checked (finisher /
-      WSL runner / dead-man's switch, registered as `MidnightBenchWindowDeadman`), identity
-      recorded at arming time, D2 verdict grep fixed, old v1 finisher retired. Stop path =
-      router's native `/models/unload`; restore = `/models/load` + touch generation. Athena
-      Dev Cycle: no such scheduled task exists (verified) — nothing to pause. DRY WINDOW
-      (v3 mandatory gate): COMPLETE + verified 2026-11-22 08:32:22 — attempt 3 ran the full
-      flow ARMED → SERVER-DOWN → DONE → RESTORED → WINDOW CLOSED with the runner live
-      (attempts 1-2 documented and fixed: 401 auth bug, runner launch argv bug). The REAL
-      window (k=21 GPU leg, D1–D4) is armed after the next checkpoint. See
+- [x] GPU vs CPU on THIS machine (3090 + i9-11900KF). **MEASURED 2026-11-22, bench window
+      (empty card, head 6bcc6a56, 16 threads):** GPU warm **4.370 s** (cold 5.352 s) vs CPU
+      warm **16.383 s** (cold 16.161 s) → **3.75×** warm / 3.02× cold; peak device
+      1,975.2 MB; all verified=true, 0 device errors, 0 fallbacks. Numbers + Summary for
+      Charles at the top of RESULTS.md; raw rows in bench-results/. Byte-identity (D2):
+      `GPU gate: passed` (evidence raw/win-d2-3090-2026-11-22.log). D4 soft-skipped
+      (off-arm prover-par binary not staged; documented in window.log). See
       `bench-window/README.md`.
-- [ ] Place 3090 numbers next to the PR's 5090-Laptop numbers with the hardware difference stated.
+- [x] Place 3090 numbers next to the PR's 5090-Laptop numbers with the hardware difference stated.
+      (RESULTS.md, 2026-11-22: window pair + "Cross-machine observations" section.)
 - [ ] Bench prover-par on/off (D4; needs a second tree without the `prover-par` feature — ABAB).
 - [x] Raw rows (tsv/json) into bench-results/, unedited. (CPU rows archived; GPU rows to follow.)
 - GPU contention note: the GPU serves the agent's own LLM backend (llama-server via the

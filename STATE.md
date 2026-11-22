@@ -1,8 +1,17 @@
 # STATE — Midnight GPU Prover, RTX 3090
 
-Resume point. Last updated: 2026-11-22 08:25 CST (cycle 6).
+Resume point. Last updated: 2026-11-22 10:25 CST (cycle 7).
 
 ## Current position
+- **HEADLINE DELIVERABLE: DONE.** REAL bench window 2026-11-22 08:40–09:45 CST (65 min,
+  closed clean: DONE → RESTORED → WINDOW CLOSED). D1 device tests pass; **D2 byte-identity:
+  `GPU gate: passed`** on the real 3090 (frozen v2 vectors + full Quint ITF through the daemon
+  adapter: 1,078 files / 40,473 transitions / 0 mismatching steps / 0 differing field
+  observations; 78 gate tests ok; kernel skew ≤ 1.5); **D3 measured on the empty card:
+  GPU warm 4.370 s / cold 5.352 s vs CPU (16t) 16.383 s / 16.161 s → 3.75× warm** (peak
+  device 1,975.2 MB); D4 soft-skipped (off-arm prover-par binary not staged — documented).
+  RESULTS.md has the Summary for Charles (reply-ready) + the numbers + evidence.
+- **All six v3 Definition-of-Done items met** (evidence in RESULTS.md / this file / LOG.md).
 - **Task 7 (formal toolchain + conformance): COMPLETE.** Full chain built and proven in WSL
   `octanode`: node 20.20.2 → `@informalsystems/quint@0.32.0` → elan 4.4.0 → Lean 4.35.0 (matches
   `lean-toolchain`) → oracle exe (119 MB, `.lake/build/bin/oracle`). `scripts/quint_check.sh`
@@ -86,7 +95,10 @@ Resume point. Last updated: 2026-11-22 08:25 CST (cycle 6).
   until the 4h cap) → arm-dry/arm-real now launch via `/root/bench/launch-*.sh` and verify the
   runner out file before ARMED. Dry window attempt 3 (08:30) then completed end-to-end
   with the runner live (full marker flow in window.log) — the v3 gate for the real window
-  is satisfied. REAL window (k=21 GPU leg, D1–D4) armed after the cycle 6b checkpoint.
+  is satisfied. REAL window ran 08:40–09:45 and closed clean: D1 pass, D2 `GPU gate:
+  passed` (byte-identity evidence raw/win-d2-3090-2026-11-22.log), D3 numbers in RESULTS.md
+  (GPU 4.370 s warm vs CPU 16.383 s warm, 16t, empty card), D4 soft-skipped (documented).
+  No open unescalated blockers.
 
 ## Bench window (GPU leg machinery)
 - Signal folder `C:\bench-window\` (WSL `/mnt/c/bench-window/`): ARMED / SERVER-DOWN / DONE /
