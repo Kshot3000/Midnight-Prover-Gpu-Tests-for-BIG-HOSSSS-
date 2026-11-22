@@ -21,7 +21,8 @@ Resume point. Last updated: 2026-11-22 08:25 CST (cycle 6).
   raw `raw/rc1-cpu-3090-2026-11-21.tsv`. (This box is slower than the PR's 5090-Laptop
   reference of 17.917 s — different machine; the GPU leg is measured on this box and quoted
   against this box's baseline.)
-- **Dry window (v3 mandate): attempts 1-2 closed, attempt 3 armed at end of cycle 6.**
+- **Dry window (v3 mandate): COMPLETE + verified 2026-11-22 08:32:22 (attempt 3; attempts
+  1-2 documented and fixed).**
   Attempt 1 (03:03): 401 at the finisher's first router check (PS 5.1 dot-assign bug → empty
   bearer) — fixed (key read inline + authenticated pre-flight). Attempt 2 (06:35): the STOP
   path worked end-to-end (unload API → worker gone → 23,513 MB free → SERVER-DOWN) but the WSL
@@ -83,7 +84,9 @@ Resume point. Last updated: 2026-11-22 08:25 CST (cycle 6).
   shell metacharacters, so `wsl.exe --exec bash -lc "setsid nohup ..."` split into argv and
   bash ran only `setsid` (the runner never ran in either attempt; nothing would have noticed
   until the 4h cap) → arm-dry/arm-real now launch via `/root/bench/launch-*.sh` and verify the
-  runner out file before ARMED. Attempt 3 armed 2026-11-22 ~08:25 CST.
+  runner out file before ARMED. Dry window attempt 3 (08:30) then completed end-to-end
+  with the runner live (full marker flow in window.log) — the v3 gate for the real window
+  is satisfied. REAL window (k=21 GPU leg, D1–D4) armed after the cycle 6b checkpoint.
 
 ## Bench window (GPU leg machinery)
 - Signal folder `C:\bench-window\` (WSL `/mnt/c/bench-window/`): ARMED / SERVER-DOWN / DONE /

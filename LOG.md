@@ -209,3 +209,15 @@
   verify the full marker flow (ARMED → SERVER-DOWN → DONE → RESTORED → WINDOW CLOSED)
   with the runner actually running; checkpoint-commit the dry-window result; then arm the
   REAL window — the k=21 GPU leg (D1–D4).
+## Cycle 6b — 2026-11-22 08:33–08:40 CST
+- DRY WINDOW ATTEMPT 3 (08:29:35 arm → 08:32:22 close, ~90 s): COMPLETE + VERIFIED, runner
+  live. Full marker flow in window.log: ARM (stale cleared, pre-flight OK, runner launch
+  via launch-dry.sh) → runner verified started (out file, 08:30:01) → ARMED (worker 3616,
+  port 56094, free 1662) → finisher: holder verified, slots idle, unload API
+  {"success":true} → worker gone, 23,478 MB free → SERVER-DOWN (08:30:13) → WSL-DRY saw it
+  (14:30:16Z), 60 s no-op → DONE → FIN saw=DONE (08:31:43) → restart: model load + touch,
+  new worker 18188 (exe + parent match record) → RESTORED → WINDOW CLOSED (08:32:22).
+  The v3 mandatory gate (dry window end-to-end before the real window) is satisfied.
+- Docs: STATE.md / TASKS.md updated (dry window complete; real window armed next).
+- Next: arm the REAL window (D1 device tests → D2 byte-identity gate → D3 rc1 k=21 GPU
+  bench → D4 prover-par soft).
