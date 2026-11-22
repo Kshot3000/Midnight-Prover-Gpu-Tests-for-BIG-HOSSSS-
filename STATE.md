@@ -1,6 +1,6 @@
 # STATE — Midnight GPU Prover, RTX 3090
 
-Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
+Resume point. Last updated: 2026-11-22 08:25 CST (cycle 6).
 
 ## Current position
 - **Task 7 (formal toolchain + conformance): COMPLETE.** Full chain built and proven in WSL
@@ -15,9 +15,23 @@ Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
   1 m 59 s; bench prepare (k=21) done (577 MB at `/root/bench/rc1-cache/rc1-chain-v1-k21/`).
 - **rc1 bench toolchain (cycle 3e): COMPLETE.** Canonical `build.sh` (repo root) → `rc1-cpu`
   3.4 MB + `rc1-gpu` (sm_86) 5.8 MB at `/root/rc1-results/bin/`; `cargo fetch` done (offline
-  builds work). **CPU baseline (3 repeats, warm=5) RUNNING** — CPU leg does not use the GPU, so it
-  proceeds while llama-server holds VRAM (contention rule permits CPU work). Log
-  `~/bench/logs/rc1-cpu-phase.log`.
+  builds work).
+- **CPU baseline (k=21, this 3090 box): COMPLETE.** Warm median **26.27 s** (range
+  21.22–27.22, stdev 1.91, 15 warm runs), cold 26.79 s, 18/18 proofs verified. In RESULTS.md;
+  raw `raw/rc1-cpu-3090-2026-11-21.tsv`. (This box is slower than the PR's 5090-Laptop
+  reference of 17.917 s — different machine; the GPU leg is measured on this box and quoted
+  against this box's baseline.)
+- **Dry window (v3 mandate): attempts 1-2 closed, attempt 3 armed at end of cycle 6.**
+  Attempt 1 (03:03): 401 at the finisher's first router check (PS 5.1 dot-assign bug → empty
+  bearer) — fixed (key read inline + authenticated pre-flight). Attempt 2 (06:35): the STOP
+  path worked end-to-end (unload API → worker gone → 23,513 MB free → SERVER-DOWN) but the WSL
+  dry runner never started (launcher argv bug — below); the agent wrote DONE after the fact
+  and the finisher completed restore → RESTORED → WINDOW CLOSED (08:19:59). Harness behavior
+  during the ~70-min outage: router stayed up; the first post-outage request triggered router
+  autoload which reloaded the model (new worker pid, same exe + parent router) — no crash, no
+  user-visible error, zero surprises. arm-dry/arm-real fixed: runner launched via
+  `/root/bench/launch-*.sh` (no shell metacharacters in the wsl.exe argv) and the runner out
+  file is verified before ARMED is written.
 - **midnight-zk head:** `6bcc6a56` (PR #667 head), merge-base `72a0512a`. Native clone
   `~/midnight-zk`, branch `pr667`.
 - **Toolchains:** WSL `octanode` CUDA 13.0 (`/usr/local/cuda/bin/nvcc`, sm_86 in DEFAULT_ARCHS),
@@ -63,10 +77,13 @@ Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
   (`MidnightBenchWindowDeadman`, 15-min cadence), D2 verdict grep fixed to the gate's real
   verdict lines. Athena Dev Cycle: no such Windows scheduled task exists (verified 187 tasks;
   all Hermes cron stores empty, Athena executions.db 0 rows) — nothing to pause; recorded as
-  `AthenaTask: null`. Dry window attempt 1 (2026-11-22 03:03) failed on a 401 at the
-  finisher's first router check: PS 5.1 dot-assign of a new property onto a ConvertFrom-Json
-  object fails silently → empty bearer token. Fixed: key read inline at every use site +
-  authenticated pre-flight before ARMED in arm-dry.ps1. Attempt 2 armed.
+  `AthenaTask: null`. Dry window: attempt 1 (03:03) failed on a 401 → fixed (key read inline
+  at every use site + authenticated pre-flight); attempt 2 (06:35) proved the stop path
+  end-to-end but exposed the runner launch bug — Start-Process -ArgumentList does not quote
+  shell metacharacters, so `wsl.exe --exec bash -lc "setsid nohup ..."` split into argv and
+  bash ran only `setsid` (the runner never ran in either attempt; nothing would have noticed
+  until the 4h cap) → arm-dry/arm-real now launch via `/root/bench/launch-*.sh` and verify the
+  runner out file before ARMED. Attempt 3 armed 2026-11-22 ~08:25 CST.
 
 ## Bench window (GPU leg machinery)
 - Signal folder `C:\bench-window\` (WSL `/mnt/c/bench-window/`): ARMED / SERVER-DOWN / DONE /
@@ -76,7 +93,11 @@ Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
   VRAM ≥ 23,000 MB free → SERVER-DOWN → wait DONE/FAILED (4 h cap) → restore via
   `POST /models/load` + touch generation → RESTORED → WINDOW CLOSED.
 - Actor 2 WSL runner: waits SERVER-DOWN; D1 → D2 (byte-identity verdict) → D3 (rc1 k=21,
-  gate ≥ 23,000 MB) → D4 (soft); nvidia-smi snapshots at stage boundaries.
+  gate ≥ 23,000 MB) → D4 (soft); nvidia-smi snapshots at stage boundaries. Launched through
+  the launcher scripts `/root/bench/launch-dry.sh` / `launch-real.sh` (the `wsl.exe --exec`
+  argv must carry no shell metacharacters; the launcher does the setsid/nohup/&); the armer
+  verifies the runner's out file exists before writing ARMED (2026-11-22, attempts 1-2
+  postmortem).
 - Actor 3 dead-man (Windows Scheduled Task, 15 min, registered forever): > 4 h 15 min since
   SERVER-DOWN → restore via router API, DEADMAN RESTORE.
 - Architecture note: my LLM backend is a Hermes-managed llama-server in router mode (port

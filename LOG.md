@@ -185,3 +185,27 @@
 - **GPU check:** busy (~21.7 GB held by llama-server = this agent's own LLM backend). Measured GPU runs deferred this cycle.
 - **Outcome:** no measured numbers yet; environment is coming up.
 - **Next:** confirm CUDA + MSVC installs; install pinned Rust 1.90.0; run stock build + full test suite (known-good floor); then gpu-without-cuda stub build.
+## Cycle 6 — 2026-11-22 06:35–08:25 CST
+- Woke on the "is it done" ping; checked dry window attempt 2.
+- Found: the STOP path worked fully (unload API → worker gone → 23,513 MB free →
+  SERVER-DOWN at 06:35:43), but the WSL dry runner had NEVER started in either attempt —
+  its out file did not exist. Root cause: Start-Process -ArgumentList does not quote shell
+  metacharacters, so `wsl.exe --exec bash -lc "setsid nohup <script> > <out> 2>&1 <
+  /dev/null &"` split into argv elements and `bash -lc` ran only the command string
+  `setsid` (everything else became positional parameters). Silent failure: nothing erred,
+  nothing logged.
+- Observed the harness behavior during the ~70-min outage (the v3 standing-order question):
+  the router stayed up; this session's first post-outage request triggered router autoload,
+  which reloaded the model (new worker 3616, same exe, parent = same router 17844). No
+  crash, no user-visible error, zero surprises.
+- Closed attempt 2 honestly: agent wrote DONE (the card had been empty from 06:35:43 until
+  the autoload reloaded the model); the finisher picked it up, verified the post-restore
+  worker (exe + parent match the record) and wrote RESTORED → WINDOW CLOSED (08:19:59).
+- Fixed arm-dry.ps1 and added arm-real.ps1: the WSL runner now launches through
+  /root/bench/launch-dry.sh / launch-real.sh (no shell metacharacters anywhere in the
+  wsl.exe argv), and the armer verifies the runner's out file exists BEFORE writing ARMED.
+  Parse-check clean.
+- Rebuilt the live identity and armed DRY WINDOW ATTEMPT 3. Stepping off. Next turn:
+  verify the full marker flow (ARMED → SERVER-DOWN → DONE → RESTORED → WINDOW CLOSED)
+  with the runner actually running; checkpoint-commit the dry-window result; then arm the
+  REAL window — the k=21 GPU leg (D1–D4).

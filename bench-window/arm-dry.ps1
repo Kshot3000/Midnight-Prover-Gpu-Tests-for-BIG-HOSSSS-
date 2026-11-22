@@ -1,9 +1,9 @@
 # ============================================================================
 # arm-dry.ps1 — arm the DRY window (the agent's last action before stepping
-# off). Verifies the holder against the record, writes ARMED, launches the
-# WSL dry runner (60s no-op) and the finisher — both detached — then
-# confirms the finisher is alive. Re-runnable: if a stale ARMED from a dead
-# window is present, it is cleared first (verified against the record).
+# off). Verifies the holder against the record, pre-flights the router API,
+# launches the WSL dry runner (60s no-op) and VERIFIES it started, writes
+# ARMED, launches the finisher — both detached — then confirms the finisher
+# is alive. Re-runnable: stale state from a dead window is cleared first.
 # ============================================================================
 $ErrorActionPreference = 'Stop'
 $dir = 'C:\bench-window'
@@ -41,14 +41,31 @@ try {
   exit 1
 }
 
+# Launch the WSL dry runner THROUGH THE LAUNCHER SCRIPT. (2026-11-22
+# postmortem, attempts 1-2: the earlier inline 'bash -lc "setsid nohup ..."'
+# string broke under Start-Process — shell metacharacters are not quoted, so
+# wsl --exec received the pieces as separate argv and bash ran only 'setsid'.
+# The runner never ran in either attempt. No shell metacharacters in argv now.)
+Start-Process -FilePath 'wsl.exe' -ArgumentList '-d','octanode','--exec','bash','/root/bench/launch-dry.sh'
+wlog 'WSL dry runner launch issued (via /root/bench/launch-dry.sh)'
+
+# Verify the runner actually started: its out file is created by the launcher's
+# redirection the moment it runs. A runner that never starts used to sit silent
+# until the 4h cap — that failure class must die in-turn, before ARMED.
+Start-Sleep -Seconds 25
+$rc = (Start-Process -FilePath 'wsl.exe' -ArgumentList '-d','octanode','--exec','test','-f','/root/bench/logs/window-runner-dry.out' -Wait -PassThru -NoNewWindow).ExitCode
+if ($rc -ne 0) {
+  wlog 'ARM-ABORT: runner out file not created 25s after launch (runner did not start)'
+  Write-Output 'ARM-ABORT: WSL runner did not start (no out file) — nothing armed; do not step off'
+  exit 1
+}
+wlog 'WSL dry runner verified started (out file created)'
+
+# write ARMED only once the runner is verified alive
 wlog ('ARM dry window armed; worker pid=' + $rec.WorkerPid + ' port=' + $rec.WorkerPort + ' router=' + $rec.RouterPid + ' model=' + $rec.ModelId + ' free_mb=' + $free)
 ((Get-Date).ToString('yyyy-MM-ddTHH:mm:ssK') + ' ARM dry window; worker pid=' + $rec.WorkerPid + ' port=' + $rec.WorkerPort + ' router=' + $rec.RouterPid) |
   Out-File (Join-Path $dir 'ARMED') -Encoding utf8
 wlog 'ARMED written'
-
-# launch the WSL dry runner (detached; survives this shell)
-Start-Process -FilePath 'wsl.exe' -ArgumentList '-d','octanode','--exec','bash','-lc','setsid nohup /root/bench/window-runner-dry.sh > /root/bench/logs/window-runner-dry.out 2>&1 < /dev/null &'
-wlog 'WSL dry runner launch issued'
 
 # launch the finisher (detached; outlives this shell)
 Start-Process -FilePath 'powershell.exe' -ArgumentList '-WindowStyle','Hidden','-NoProfile','-ExecutionPolicy','Bypass','-File',("$dir\finisher.ps1")
