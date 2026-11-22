@@ -25,9 +25,13 @@ Statuses: OPEN / DOING / BLOCKED / DONE.
       verifier. **CPU MEASURED 2026-11-21:** 3 repeats × (1 cold + 5 warm) = 18 proofs, k=21,
       8 prover threads. **CPU warm prove 26.27 s median** (21.22–27.22, stdev 1.91); cold 26.79 s
       median; all 18 verified=true (verify ~1.8 ms). Raw: `raw/rc1-cpu-3090-2026-11-21.tsv`.
-- [ ] GPU vs CPU on THIS machine (3090 + i9-11900KF). **GPU leg DEFERRED — llama-server holds
-      ~21.7 GB VRAM; CPU leg needs no GPU so it ran anyway. device-phase.sh staged (gated
-      free_mb>=2560) fires D3 the moment VRAM frees.**
+- [ ] GPU vs CPU on THIS machine (3090 + i9-11900KF). **GPU leg → bench window (v2 standing
+      orders).** Phase 0 complete 2026-11-22: three actors built + parse-checked (finisher /
+      WSL runner / dead-man's switch, registered as `MidnightBenchWindowDeadman`), identity
+      recorded at arming time, D2 verdict grep fixed, old v1 finisher retired. Stop path =
+      router's native `/models/unload`; restore = `/models/load` + touch generation. Athena
+      Dev Cycle: no such scheduled task exists (verified) — nothing to pause. DRY WINDOW
+      armed next (60 s no-op), then the real one. See `bench-window/README.md`.
 - [ ] Place 3090 numbers next to the PR's 5090-Laptop numbers with the hardware difference stated.
 - [ ] Bench prover-par on/off (D4; needs a second tree without the `prover-par` feature — ABAB).
 - [x] Raw rows (tsv/json) into bench-results/, unedited. (CPU rows archived; GPU rows to follow.)

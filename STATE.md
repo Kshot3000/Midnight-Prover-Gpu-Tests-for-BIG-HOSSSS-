@@ -56,7 +56,34 @@ Resume point. Last updated: 2026-11-21 15:55 CST (cycle 3e).
   toolchain work is parked, not cancelled.
 - Measured benchmarks (task 4) deferred: 3090 holds ~21.7 GB for llama-server (this agent's own
   LLM backend), ~2.8 GB free. Per contention rule: check `nvidia-smi` before each measured run;
-  when busy, log "GPU busy, deferring" and work non-GPU items.
+  when busy, log "GPU busy, deferring" and work non-GPU items. **SUPERSEDED by the bench window**
+  (v2 standing orders 2026-11-21, Kyle-approved): the three-actor window runs the GPU leg with
+  the server briefly stopped and restored. See `bench-window/README.md`. Phase 0 complete
+  2026-11-22: identity recorded, finisher/dead-man built + parse-checked, dead-man registered
+  (`MidnightBenchWindowDeadman`, 15-min cadence), D2 verdict grep fixed to the gate's real
+  verdict lines. Athena Dev Cycle: no such Windows scheduled task exists (verified 187 tasks;
+  all Hermes cron stores empty, Athena executions.db 0 rows) — nothing to pause; recorded as
+  `AthenaTask: null`. Dry window armed next.
+
+## Bench window (GPU leg machinery)
+- Signal folder `C:\bench-window\` (WSL `/mnt/c/bench-window/`): ARMED / SERVER-DOWN / DONE /
+  FAILED-<stage> / RESTORED / RESTORED-FAILED / window.log / raw/.
+- Actor 1 finisher (Windows, detached): verify holder vs record → stop via router's native
+  `POST /models/unload` (worker is the router's child; that's its designed graceful path) →
+  VRAM ≥ 23,000 MB free → SERVER-DOWN → wait DONE/FAILED (4 h cap) → restore via
+  `POST /models/load` + touch generation → RESTORED → WINDOW CLOSED.
+- Actor 2 WSL runner: waits SERVER-DOWN; D1 → D2 (byte-identity verdict) → D3 (rc1 k=21,
+  gate ≥ 23,000 MB) → D4 (soft); nvidia-smi snapshots at stage boundaries.
+- Actor 3 dead-man (Windows Scheduled Task, 15 min, registered forever): > 4 h 15 min since
+  SERVER-DOWN → restore via router API, DEADMAN RESTORE.
+- Architecture note: my LLM backend is a Hermes-managed llama-server in router mode (port
+  18434, child of the Hermes app); the Qwen worker is the router's child process. The
+  supervisor (`hermes_cli/local_runtime/supervisor.py`) manages models via /models/load,
+  /models/unload + touch generation — the window uses exactly those paths and never spawns
+  or pattern-kills processes. The router API key is NOT stored in the record file; actors
+  read it live from the hermes runtimes llamacpp `.api_key` store (see bench-window/README.md).
+- Identity is recorded AT ARMING TIME (`rebuild-record.ps1`): the router/worker pair
+  restarts on the hour with changing ports, so a stale record is a hard abort, not a guess.
 
 ## Standing reminders
 - Commit + push after EVERY step. The repo is the record.

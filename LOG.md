@@ -1,5 +1,51 @@
 # LOG — heartbeat per cycle
 
+## 2026-11-22 02:30 CST — cycle 4 (bench window, Phase 0)
+- **Item:** read the v2 standing-orders rewrite ("complete standing orders (rewritten
+  2026-11-21)"); built and verified the bench-window machinery (Phase 0, steps 1–3).
+- **Findings:**
+  - **llama-server architecture decoded (why the old finisher design was wrong):** my LLM
+    backend is a Hermes-managed llama-server in ROUTER mode (port 18434, child of the
+    Hermes app; state in `runtimes/llamacpp/server.json`). The Qwen3.8-27B worker is the
+    router's CHILD process (spawned with a per-hour port; identity captured live: worker
+    20688 :53024, router 14828). The supervisor (`local_runtime/supervisor.py`) manages
+    models via `POST /models/load` + `POST /models/unload` + touch generation (temp-0,
+    expected token). Consequence: the finisher's stop path is the router's own unload
+    endpoint (its designed graceful path — no PID kills), and the restore path is
+    `/models/load` + touch (replaying the worker command line would orphan the router).
+  - **All three actors built + parse-checked** (`bench-window/` in the repo, live copies in
+    `C:\bench-window\`, runner scripts installed into WSL `/root/bench/`): finisher.ps1
+    (Actor 1: verify holder vs record → unload → VRAM ≥ 23,000 MB → SERVER-DOWN → wait
+    DONE/FAILED 4 h cap → restore → RESTORED → WINDOW CLOSED), window-runner.sh (Actor 2:
+    D1 → D2 → D3 → D4, gates 2,560/2,560/23,000 MB, nvidia-smi snapshots at stage
+    boundaries, D2 verdict read from the gate's real `GPU gate: FAILED/passed` lines — the
+    earlier grep for "disagreement" would have false-failed, fixed), deadman.ps1 (Actor 3)
+    + registered as Windows Scheduled Task `MidnightBenchWindowDeadman` (15-min cadence,
+    one-shot registration, left forever; manual no-op run verified).
+  - **Phase 0 step 1 (identity) done:** `server-record.json` rebuilt from live processes
+    AT ARMING TIME (`rebuild-record.ps1`) — the router/worker pair restarts on the hour
+    with changing ports, so a stale record is a hard abort, never a guess. The router API
+    key is deliberately NOT in the record; actors read it live from the hermes runtimes
+    `.api_key` store (no key in any file we commit; verified).
+  - **Phase 0 step 3 (pause Athena Dev Cycle): no such task exists.** Verified exhaustively:
+    187 Windows scheduled tasks, none matching athena/dev-cycle/midnight/llama by name or
+    action; all four Hermes profiles' cron stores empty (`hermes cron list --all` = 0,
+    Athena `executions.db` = 0 rows, no `jobs.json` anywhere). Athena runs via the Hermes
+    app/CLI, not a scheduled task. Nothing to pause — recorded `AthenaTask: null` and the
+    finisher re-checks at close (no-op). Contention risk during the window: none scheduled.
+  - WSL housekeeping: keep-alive `sleep 604800` verified alive (2 procs after VM restart);
+    old `/root/bench/bench-window-finish.sh` (the superseded v1 headless finisher that
+    pattern-matched port 62200 and hardcoded the router key) retired to
+    `bench-window-finish.sh.superseded-20261122`.
+  - **CPU baseline already in RESULTS.md** (cycle 3e row: 26.27 s warm median) — the
+    rewrite's "write the measured CPU baseline into RESULTS.md" first action is already
+    satisfied by cfb44d4; nothing to add.
+- **GPU check:** still busy (llama-server). No measured GPU runs this cycle.
+- **Next:** Phase 0 step 4 — DRY WINDOW: `arm-dry.ps1` (verify holder → ARMED → 60 s no-op
+  WSL runner + detached finisher), step off, then on waking verify the full sequence in
+  `window.log` + `RESTORED` + a normal agent turn, note harness behavior during the outage,
+  commit "BENCH WINDOW ARMED + dry-window outcome", and only then arm the real window.
+
 ## 2026-11-21 15:52 CST — cycle 3e
 - **Item:** conformance replay completed (task 7 closed); rc1 bench binaries pre-built; CPU baseline phase started.
 - **Findings:**
